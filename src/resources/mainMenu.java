@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class mainMenu extends JFrame {
+public class mainMenu extends JFrame  {
     private void startTimer(){
         timer.start();
     }
