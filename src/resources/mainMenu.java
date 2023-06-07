@@ -9,9 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class mainMenu extends JFrame  {
-    private void startTimer(){
-        timer.start();
-    }
+   private Timer timer;
     private int estado=0;
     private Header headerProject;
     private JButton initGame,rules,yesButton,noButton;
@@ -24,9 +22,6 @@ public class mainMenu extends JFrame  {
     private JLabel textTimer;
     List<String> wordsToMemorize;
     List<String> theOtherWords;
-    Timer timer;
-
-
 
     public mainMenu(){
         initGUI();
@@ -42,7 +37,20 @@ public class mainMenu extends JFrame  {
     }
 
     private void initGUI() {
-        timer = new Timer(1000, escucha);
+        timer = new Timer(1000, new ActionListener() {
+            private int counter = 0;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (counter < wordsToMemorize.size()) {
+                    String palabra = wordsToMemorize.get(counter);
+                    textTimer.setText(palabra);
+                    counter++;
+                } else {
+                    timer.stop();
+                }
+            }
+        });
 
         textTimer = new JLabel("HOLA");
 
@@ -82,17 +90,16 @@ public class mainMenu extends JFrame  {
         buttonPanel.add(rules);
         textPanel.add(textTimer);
 
+        principalPanel.setLayout(new BorderLayout());
+        principalPanel.add(buttonPanel,BorderLayout.SOUTH);
+        principalPanel.add(playerUsername,BorderLayout.CENTER);
+        principalPanel.add(textPanel,BorderLayout.NORTH);
 
-        //principalPanel.add(playerUsername,BorderLayout.CENTER);
-        //principalPanel.add(buttonPanel,BorderLayout.SOUTH);
-        //principalPanel.add(textPanel,BorderLayout.NORTH);
-        this.add(playerUsername,BorderLayout.CENTER);
-        this.add(buttonPanel,BorderLayout.SOUTH);
-        this.add(textPanel,BorderLayout.NORTH);
+        this.add(principalPanel);
         pack();
     }
 
-    public void GUIInGame(){
+    public void showWordsAndValidate(){
 
     }
 
@@ -150,18 +157,6 @@ public class mainMenu extends JFrame  {
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == initGame) {
                 initGame();
-                counter = 0; // Reinicia el contador al iniciar el juego
-                timer.start();
-            }
-            if (e.getSource() == timer) {
-                System.out.println("El timer está corriendo? " + String.valueOf(timer.isRunning()));
-                if (counter < wordsToMemorize.size()) {
-                    String palabra = wordsToMemorize.get(counter);
-                    textTimer.setText(palabra);
-                    counter++; // Incrementa el contador para obtener la siguiente palabra en la siguiente ejecución
-                } else {
-                    timer.stop();
-                }
             }
         }
     }
