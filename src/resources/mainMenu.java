@@ -82,16 +82,14 @@ public class mainMenu extends JFrame {
         buttonPanel.add(rules);
         textPanel.add(textTimer);
 
-        principalPanel.setLayout(new BorderLayout());
-        principalPanel.add(playerUsername,BorderLayout.CENTER);
-        principalPanel.add(buttonPanel,BorderLayout.SOUTH);
-        principalPanel.add(textPanel,BorderLayout.NORTH);
 
-
-
-        this.add(principalPanel);
+        //principalPanel.add(playerUsername,BorderLayout.CENTER);
+        //principalPanel.add(buttonPanel,BorderLayout.SOUTH);
+        //principalPanel.add(textPanel,BorderLayout.NORTH);
+        this.add(playerUsername,BorderLayout.CENTER);
+        this.add(buttonPanel,BorderLayout.SOUTH);
+        this.add(textPanel,BorderLayout.NORTH);
         pack();
-
     }
 
     public void GUIInGame(){
@@ -146,29 +144,24 @@ public class mainMenu extends JFrame {
     }
 
     private class Escucha implements ActionListener {
+        private int counter = 0; // Agrega una variable de contador
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println(" Esta corriendo: "+String.valueOf(timer.isRunning()));
-            if (e.getSource()==initGame){
+            if (e.getSource() == initGame) {
                 initGame();
-                System.out.println(" Esta corriendo: "+String.valueOf(timer.isRunning()));
+                counter = 0; // Reinicia el contador al iniciar el juego
+                timer.start();
             }
-            if (e.getSource()==timer){
-                int cantidadAMemorizar=wordsToMemorize.size();
-                System.out.println(cantidadAMemorizar);
-                if (counter<=cantidadAMemorizar){
+            if (e.getSource() == timer) {
+                System.out.println("El timer está corriendo? " + String.valueOf(timer.isRunning()));
+                if (counter < wordsToMemorize.size()) {
                     String palabra = wordsToMemorize.get(counter);
                     textTimer.setText(palabra);
-                    textPanel.add(textTimer);
-                    System.out.println(palabra);
-                    textPanel.revalidate();
-                    textPanel.repaint();
-                    counter++;
-                }else {
+                    counter++; // Incrementa el contador para obtener la siguiente palabra en la siguiente ejecución
+                } else {
                     timer.stop();
                 }
-
             }
         }
     }
