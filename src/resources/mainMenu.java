@@ -6,22 +6,27 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class mainMenu extends JFrame  {
-   private Timer timer;
-    private int estado=0;
-    private Header headerProject;
+    private Timer timer;
+    private Timer wordTimer;
+    private boolean trueOrFalse;
     private JButton initGame,rules,yesButton,noButton;
 
     private JPanel principalPanel,buttonPanel,textPanel,counterPanel;
     private JTextField playerUsername;
 
     private Escucha escucha;
-    private int counter=0;
+    private int comparer=0;
     private JLabel textTimer;
-    List<String> wordsToMemorize;
-    List<String> theOtherWords;
+    private List<String> wordsToMemorize;
+    private List<String> theOtherWords;
+    private List<String> selectdWords;
+    private List<String> noWords;
+
 
     public mainMenu(){
         initGUI();
@@ -37,7 +42,7 @@ public class mainMenu extends JFrame  {
     }
 
     private void initGUI() {
-        timer = new Timer(1000, new ActionListener() {
+        timer = new Timer(500, new ActionListener() {
             private int counter = 0;
 
             @Override
@@ -48,23 +53,54 @@ public class mainMenu extends JFrame  {
                     counter++;
                 } else {
                     timer.stop();
+                    showWordsAndValidate();
                 }
             }
         });
+
 
         textTimer = new JLabel("HOLA");
 
         yesButton=new JButton("Yes");
         yesButton.setBackground(Color.green);
         yesButton.setOpaque(true);
+        yesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (wordTimer.isRunning()){
+                    String validar = textTimer.getText();
+                    if (selectdWords.contains(validar)){
+                        trueOrFalse = true;
+                        if (trueOrFalse == true){
+                            comparer++;
+                            System.out.println(comparer);
+                        }
+                    }
+                    selectdWords.add(validar);
+                    System.out.println(selectdWords);
+                }
+            }
+        });
 
         noButton=new JButton("No");
+        noButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (wordTimer.isRunning()){
+                    System.out.println("Se presiono  No");
+
+                }
+            }
+        });
         noButton.setBackground(Color.red);
         noButton.setOpaque(true);
 
         buttonPanel = new JPanel();
         textPanel = new JPanel();
         counterPanel= new JPanel();
+
+        counterPanel.add(yesButton);
+        counterPanel.add(noButton);
 
 
         imagePanel backgroundImage = new imagePanel("/resources/GuiFiles/mainMenuBackground.jpg");
@@ -99,20 +135,57 @@ public class mainMenu extends JFrame  {
         pack();
     }
 
-    public void showWordsAndValidate(){
+    public void showWordsAndValidate() {
+        List<String> palabrasMezcladas = new ArrayList<>();
+        palabrasMezcladas.addAll(wordsToMemorize);
+        palabrasMezcladas.addAll(theOtherWords);
+        System.out.println(palabrasMezcladas);
+        Collections.shuffle(palabrasMezcladas);
+        System.out.println(palabrasMezcladas);
+
+        JOptionPane.showMessageDialog(null, "Select Yes if the word was in the ones shown above, if it was not found press No, you have 5 seconds to do it");
+        yesButton.setEnabled(false);
+        noButton.setEnabled(false);
+
+        wordTimer = new Timer(500, new ActionListener() {
+            private int counter =0;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                yesButton.setEnabled(true);
+                noButton.setEnabled(true);
+                if (counter<palabrasMezcladas.size()){
+                    String Word = palabrasMezcladas.get(counter);
+                    textTimer.setText(Word);
+                    counter++;
+                }else {
+                    wordTimer.stop();
+                    int palabrasAmemorizar= wordsToMemorize.size();
+                    int porcentaje;
+                    porcentaje = (comparer/palabrasAmemorizar)*100;
+                    System.out.println(porcentaje+" Este es el porcentaje");
+
+                }
+
+            }
+        });
+        wordTimer.start();
 
     }
 
     public void initGame(){
 
+        selectdWords = new ArrayList<>();
 
         principalPanel.removeAll();
         principalPanel.revalidate();
         principalPanel.repaint();
 
 
-        principalPanel.add(textPanel);
-        principalPanel.add(counterPanel);
+        principalPanel.add(textPanel,BorderLayout.CENTER);
+        principalPanel.add(counterPanel,BorderLayout.SOUTH);
+        yesButton.setEnabled(false);
+        noButton.setEnabled(false);
+
         principalPanel.repaint();
         principalPanel.revalidate();
 
