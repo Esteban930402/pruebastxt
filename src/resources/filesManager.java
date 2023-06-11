@@ -96,4 +96,33 @@ public class filesManager {
         }
         return ronda;
     }
+    public void updateLevel(String explorerID,String name, int newlevel){
+        try {
+            File file = new File(explorerID);
+            List<String> lines = new ArrayList<>();
+
+            try (Scanner scanner = new Scanner(file)){
+                while (scanner.hasNextLine()){
+                    String line = scanner.nextLine();
+                    String[] parts = line.split(":");
+
+                    if (parts.length ==2 && parts[0].equals(name)){
+                        line = parts[0]+":"+ newlevel;
+                    }
+                    lines.add(line);
+                }
+            }
+
+            try (FileWriter fileWriter = new FileWriter(file)){
+                for (String line : lines){
+                    fileWriter.write(line);
+                    fileWriter.write(System.lineSeparator());
+                }
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

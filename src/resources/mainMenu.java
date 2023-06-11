@@ -13,6 +13,7 @@ import java.util.List;
 public class mainMenu extends JFrame  {
     private Timer timer;
     private Timer wordTimer;
+    private String name;
     private boolean trueOrFalse;
     private JButton initGame,rules,yesButton,noButton;
 
@@ -42,6 +43,8 @@ public class mainMenu extends JFrame  {
     }
 
     private void initGUI() {
+        name = new String();
+
         timer = new Timer(500, new ActionListener() {
             private int counter = 0;
 
@@ -69,12 +72,9 @@ public class mainMenu extends JFrame  {
             public void actionPerformed(ActionEvent e) {
                 if (wordTimer.isRunning()){
                     String validar = textTimer.getText();
-                    if (selectdWords.contains(validar)){
-                        trueOrFalse = true;
-                        if (trueOrFalse == true){
+                    if (wordsToMemorize.contains(validar)){
                             comparer++;
                             System.out.println(comparer);
-                        }
                     }
                     selectdWords.add(validar);
                     System.out.println(selectdWords);
@@ -88,7 +88,6 @@ public class mainMenu extends JFrame  {
             public void actionPerformed(ActionEvent e) {
                 if (wordTimer.isRunning()){
                     System.out.println("Se presiono  No");
-
                 }
             }
         });
@@ -143,29 +142,35 @@ public class mainMenu extends JFrame  {
         Collections.shuffle(palabrasMezcladas);
         System.out.println(palabrasMezcladas);
 
+
         JOptionPane.showMessageDialog(null, "Select Yes if the word was in the ones shown above, if it was not found press No, you have 5 seconds to do it");
         yesButton.setEnabled(false);
         noButton.setEnabled(false);
 
-        wordTimer = new Timer(500, new ActionListener() {
+        wordTimer = new Timer(2000, new ActionListener() {
             private int counter =0;
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (e.getSource()==yesButton){
+                    yesButton.setEnabled(false);
+                }
                 yesButton.setEnabled(true);
                 noButton.setEnabled(true);
                 if (counter<palabrasMezcladas.size()){
+                    yesButton.setEnabled(true);
                     String Word = palabrasMezcladas.get(counter);
                     textTimer.setText(Word);
                     counter++;
                 }else {
                     wordTimer.stop();
+                    yesButton.setEnabled(false);
+                    noButton.setEnabled(false);
                     int palabrasAmemorizar= wordsToMemorize.size();
-                    int porcentaje;
-                    porcentaje = (comparer/palabrasAmemorizar)*100;
-                    System.out.println(porcentaje+" Este es el porcentaje");
+                    int porcentaje = (comparer*100)/palabrasAmemorizar;
+                    System.out.println("Porcentaje de coincidencia: " + porcentaje + "%");
+
 
                 }
-
             }
         });
         wordTimer.start();
@@ -192,9 +197,9 @@ public class mainMenu extends JFrame  {
         filesManager filesManager = new filesManager();
         String database = "C:\\Users\\Owner\\IdeaProjects\\pruebastxt\\src\\resources\\database.txt";
         String file = "C:\\Users\\Owner\\IdeaProjects\\pruebastxt\\src\\resources\\words.txt";
-        String nombre = playerUsername.getText();
-        filesManager.manageName(database,nombre);
-        int level = filesManager.manageName(database,nombre);
+        name = playerUsername.getText();
+        filesManager.manageName(database,name);
+        int level = filesManager.manageName(database,name);
 
         try {
             List<String> randomLines = filesManager.getRandomLines(file, level);
