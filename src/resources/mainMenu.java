@@ -1,5 +1,6 @@
 package resources;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,11 +13,14 @@ import java.util.List;
 public class mainMenu extends JFrame  {
     private Timer timer;
     private Timer wordTimer;
-    private String name, database,file;
+    private String name, database,file; //String name se usara para almacenar el nombre de usuario ingresado,
+                                        //database almacenara la direccion del txt que sera utilizado para la base de dados
+                                        //file, se almacenara la direccion del txt donde estan las palabras que se utilizaran en el programa
     private int level;
-    private JButton initGame,rules,yesButton,noButton;
+    private JButton initGame,rules,yesButton;
+    private Image backgroundTest;
 
-    private JPanel principalPanel,buttonPanel,textPanel,counterPanel;
+    private JPanel principalPanel,buttonPanel,textPanel,counterPanel,backgroundPanel;
     private JTextField playerUsername;
     private Escucha escucha;
     private int comparer=0;
@@ -29,7 +33,6 @@ public class mainMenu extends JFrame  {
         initGUI();
         setIconImage(new ImageIcon(getClass().getResource("/resources/Imagen1.jpg")).getImage());
         //Default JFrame configuration
-        this.setLayout(new BorderLayout());
         this.setTitle("I Know That Word");
         this.setSize(1020,720);
         this.setResizable(true);
@@ -39,6 +42,33 @@ public class mainMenu extends JFrame  {
     }
 
     private void initGUI() {
+        backgroundPanel = new JPanel(){
+            protected void paintComponent(Graphics g){
+                super.paintComponent(g);
+                if(backgroundTest!=null){
+                    //int x = (getWidth()-backgroundTest.getWidth(null))/2;
+                    //int y = (getHeight()-backgroundTest.getHeight(null))/2;
+                    g.drawImage(backgroundTest,0,0,getWidth(),getHeight(),null);
+                }
+
+            }
+        };
+        backgroundPanel.setPreferredSize(new Dimension(1400,1080));
+
+        //Creacion de hilo
+
+        Thread hilo= new Thread(){
+            @Override
+            public void run(){
+                try {
+                    backgroundTest= ImageIO.read(getClass().getResource("/resources/imagenfondo.jpg"));
+                    backgroundPanel.repaint();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        hilo.start();
 
         file= new String();
         database = new String();
@@ -59,7 +89,7 @@ public class mainMenu extends JFrame  {
             }
         });
 
-        textTimer = new JLabel("HOLA");
+        textTimer = new JLabel("I KNOW THAT WORD!!!");
         yesButton=new JButton("Yes");
         yesButton.setBackground(Color.green);
         yesButton.setOpaque(true);
@@ -78,7 +108,7 @@ public class mainMenu extends JFrame  {
             }
         });
 
-        noButton=new JButton("No");
+        /*noButton=new JButton("No");
         noButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -88,45 +118,43 @@ public class mainMenu extends JFrame  {
             }
         });
         noButton.setBackground(Color.red);
-        noButton.setOpaque(true);
+        noButton.setOpaque(true);*/
 
-        buttonPanel = new JPanel();
-        textPanel = new JPanel();
-        counterPanel= new JPanel();
+        this.buttonPanel = new JPanel();
+        this.textPanel = new JPanel();
+        this.counterPanel= new JPanel();
 
-        counterPanel.add(yesButton);
-        counterPanel.add(noButton);
+        this.counterPanel.add(yesButton);
 
         imagePanel backgroundImage = new imagePanel("/resources/GuiFiles/mainMenuBackground.jpg");
         backgroundImage.setLayout(new BorderLayout());
 
-        wordsToMemorize = new ArrayList<>();
-        theOtherWords = new ArrayList<>();
+        this.wordsToMemorize = new ArrayList<>();
+        this.theOtherWords = new ArrayList<>();
 
-        escucha = new Escucha();
+        this.escucha = new Escucha();
 
-        playerUsername = new JTextField(null,20);
-        playerUsername.setHorizontalAlignment(JTextField.CENTER);
+        this.playerUsername = new JTextField(null,20);
+        this.playerUsername.setHorizontalAlignment(JTextField.CENTER);
 
-        principalPanel = new JPanel();
+        this.principalPanel = new JPanel();
 
-        initGame = new JButton("Iniciar Juego");
-        initGame.addActionListener(escucha);
+        this.initGame = new JButton("Iniciar Juego");
+        this.initGame.addActionListener(escucha);
 
-        rules = new JButton("Reglas");
-        rules.addActionListener(escucha);
+        this.rules = new JButton("Reglas");
+        this.rules.addActionListener(escucha);
 
-        buttonPanel.add(initGame);
-        buttonPanel.add(rules);
-        textPanel.add(textTimer);
+        this.buttonPanel.add(initGame);
+        this.buttonPanel.add(rules);
+        this.buttonPanel.add(textTimer);
 
-        principalPanel.setLayout(new BorderLayout());
-        principalPanel.add(buttonPanel,BorderLayout.SOUTH);
-        principalPanel.add(playerUsername,BorderLayout.CENTER);
-        principalPanel.add(textPanel,BorderLayout.NORTH);
+        this.backgroundPanel.setLayout(new BorderLayout());
+        this.principalPanel.add(buttonPanel,BorderLayout.SOUTH);
 
-        this.add(principalPanel);
-        pack();
+
+        this.backgroundPanel.add(principalPanel,BorderLayout.SOUTH);
+        getContentPane().add(principalPanel);
     }
 
     public void showWordsAndValidate() {
@@ -138,8 +166,7 @@ public class mainMenu extends JFrame  {
         System.out.println(palabrasMezcladas);
         JOptionPane.showMessageDialog(null, "Select Yes if the word was in the ones shown above, if it was not found press No, you have 5 seconds to do it");
         yesButton.setEnabled(false);
-        noButton.setEnabled(false);
-        wordTimer = new Timer(2000, new ActionListener() {
+        wordTimer = new Timer(500, new ActionListener() {
             private int counter =0;
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -147,7 +174,6 @@ public class mainMenu extends JFrame  {
                     yesButton.setEnabled(false);
                 }
                 yesButton.setEnabled(true);
-                noButton.setEnabled(true);
                 if (counter<palabrasMezcladas.size()){
                     yesButton.setEnabled(true);
                     String Word = palabrasMezcladas.get(counter);
@@ -156,7 +182,6 @@ public class mainMenu extends JFrame  {
                 }else {
                     wordTimer.stop();
                     yesButton.setEnabled(false);
-                    noButton.setEnabled(false);
                     int palabrasAmemorizar= wordsToMemorize.size();
                     int porcentaje = (comparer*100)/palabrasAmemorizar;
                     System.out.println("Porcentaje de coincidencia: " + porcentaje + "%");
@@ -217,7 +242,6 @@ public class mainMenu extends JFrame  {
         principalPanel.add(textPanel,BorderLayout.CENTER);
         principalPanel.add(counterPanel,BorderLayout.SOUTH);
         yesButton.setEnabled(false);
-        noButton.setEnabled(false);
         principalPanel.repaint();
         principalPanel.revalidate();
         filesManager filesManager = new filesManager();
