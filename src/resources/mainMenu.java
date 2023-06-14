@@ -18,9 +18,9 @@ public class mainMenu extends JFrame  {
                                         //file, se almacenara la direccion del txt donde estan las palabras que se utilizaran en el programa
     private int level;
     private JButton initGame,rules,yesButton;
-    private Image backgroundTest;
+    private Image backgroundTest,backgroundTest2;
 
-    private JPanel principalPanel,buttonPanel,textPanel,counterPanel,backgroundPanel;
+    private JPanel principalPanel,buttonPanel,textPanel,counterPanel,backgroundPanel,inGameBackgroundPanel;
     private JTextField playerUsername;
     private Escucha escucha;
     private int comparer=0;
@@ -35,6 +35,7 @@ public class mainMenu extends JFrame  {
         //Default JFrame configuration
         this.setTitle("I Know That Word");
         this.setSize(1020,720);
+        this.getContentPane();
         this.setResizable(true);
         this.setVisible(true);
         this.setLocationRelativeTo(null);
@@ -61,7 +62,7 @@ public class mainMenu extends JFrame  {
             @Override
             public void run(){
                 try {
-                    backgroundTest= ImageIO.read(getClass().getResource("/resources/imagenfondo.jpg"));
+                    backgroundTest= ImageIO.read(getClass().getResource("/resources/12.jpg"));
                     backgroundPanel.repaint();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -69,6 +70,8 @@ public class mainMenu extends JFrame  {
             }
         };
         hilo.start();
+
+
 
         file= new String();
         database = new String();
@@ -145,16 +148,16 @@ public class mainMenu extends JFrame  {
         this.rules = new JButton("Reglas");
         this.rules.addActionListener(escucha);
 
+        this.buttonPanel.add(playerUsername);
         this.buttonPanel.add(initGame);
         this.buttonPanel.add(rules);
-        this.buttonPanel.add(textTimer);
 
         this.backgroundPanel.setLayout(new BorderLayout());
         this.principalPanel.add(buttonPanel,BorderLayout.SOUTH);
 
 
         this.backgroundPanel.add(principalPanel,BorderLayout.SOUTH);
-        getContentPane().add(principalPanel);
+        getContentPane().add(backgroundPanel);
     }
 
     public void showWordsAndValidate() {
@@ -234,13 +237,62 @@ public class mainMenu extends JFrame  {
     }
 
     public void initGame(){
+        inGameBackgroundPanel = new JPanel(){
+            protected void paintComponent(Graphics g){
+                super.paintComponent(g);
+                if(backgroundTest2!=null){
+                    //int x = (getWidth()-backgroundTest.getWidth(null))/2;
+                    //int y = (getHeight()-backgroundTest.getHeight(null))/2;
+                    g.drawImage(backgroundTest2,0,0,getWidth(),getHeight(),null);
+                }
+
+            }
+        };
+        inGameBackgroundPanel.setPreferredSize(new Dimension(1400,1080));
+
+        //Creacion de hilo
+
+        Thread hilo2= new Thread(){
+            @Override
+            public void run(){
+                try {
+                    backgroundTest2= ImageIO.read(getClass().getResource("/resources/mainMenuBackground.jpg"));
+                    inGameBackgroundPanel.repaint();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        hilo2.start();
 
         selectdWords = new ArrayList<>();
+        getContentPane().removeAll();
+        getContentPane().revalidate();
+        getContentPane().repaint();
         principalPanel.removeAll();
-        principalPanel.revalidate();
         principalPanel.repaint();
-        principalPanel.add(textPanel,BorderLayout.CENTER);
-        principalPanel.add(counterPanel,BorderLayout.SOUTH);
+        principalPanel.revalidate();
+        //principalPanel.setLayout(new BorderLayout());
+        //textPanel.add(textTimer);
+        textTimer.setBounds(420,320,100,30);
+        textTimer.setFont(textTimer.getFont().deriveFont(Font.ITALIC,60));
+        yesButton.setBounds(500,320,500,500);
+        inGameBackgroundPanel.add(yesButton);
+        //principalPanel.add(textPanel,BorderLayout.NORTH);
+        //principalPanel.add(yesButton,BorderLayout.SOUTH);
+        inGameBackgroundPanel.add(textTimer);
+
+
+        getContentPane().add(inGameBackgroundPanel);
+        getContentPane().repaint();
+        getContentPane().revalidate();
+        //backgroundPanel.removeAll();
+        //backgroundPanel.repaint();
+        //backgroundPanel.revalidate();
+        //principalPanel.removeAll();
+        //principalPanel.revalidate();
+        //principalPanel.repaint();
+        //principalPanel.add(counterPanel);
         yesButton.setEnabled(false);
         principalPanel.repaint();
         principalPanel.revalidate();
